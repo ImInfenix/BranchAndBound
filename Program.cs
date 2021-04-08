@@ -12,17 +12,51 @@ namespace BranchAndBound
 
         static void Main(string[] args)
         {
-            matrix = new TwoDMatrix(5);
+            Console.WriteLine("Travelling Salesman - Branch and bound");
+            Console.WriteLine("1 - Meilleur d'abord");
+            Console.WriteLine("2 - Profondeur");
+            Console.WriteLine("Choix : ");
+            int choice = int.Parse(Console.ReadLine());
 
-            Console.WriteLine(matrix.ToString());
+            Console.WriteLine("Algo vorace en borne sup ?");
+            bool doGlutto = bool.Parse(Console.ReadLine());
 
-            GluttonyShortestPath();
+            int nbExec = 10;
 
-            Console.WriteLine($"\nGluttony path found is {PathToString(pcc)} - cost is {pccCost}");
+            Console.WriteLine("Taille de la matrice : ");
+            int matrixSize = int.Parse(Console.ReadLine());
 
-            TravellingSalesman(matrix);
+            Console.WriteLine("----------------------------");
+            Console.WriteLine("Choice is " + choice);
+            Console.WriteLine("Nb Exec is " + nbExec);
+            Console.WriteLine("Size is " + matrixSize);
+            Console.WriteLine("Gluttony first : " + doGlutto);
 
-            Console.WriteLine($"\nShortest path found is {PathToString(pcc)}");
+            DateTime totalTime = new DateTime(0);
+
+            for(int i =0; i < nbExec; i++)
+            {
+                Console.WriteLine($"Computing pass {i}");
+
+                DateTime start = DateTime.Now;
+                if (choice == 1)
+                    TravellingSalesmanMeilleur(doGlutto, matrixSize);
+                else if (choice == 2)
+                    TravellingSalesmanProfondeur(doGlutto, matrixSize);
+                else return;
+                DateTime end = DateTime.Now;
+
+                totalTime += end - start;
+                Console.WriteLine($"Ended with a  time of {end - start}");
+            }
+
+            long total = totalTime.Ticks;
+
+            total = total / (long)nbExec;
+
+            Console.WriteLine($"Ended with an average time of {new DateTime(total)}");
+
+            Console.ReadLine();
         }
 
         static string PathToString(List<int> toPrint)
@@ -39,25 +73,46 @@ namespace BranchAndBound
 
         }
 
-        static void TravellingSalesman(TwoDMatrix matrix)
+        static void TravellingSalesmanMeilleur(bool initWithGluttony, int matrixSize)
         {
+            matrix = new TwoDMatrix(matrixSize);
+
+            pcc = null;
+            pccCost = int.MaxValue;
+
+            if (initWithGluttony)
+                GluttonyShortestPath();
+
             int numberOfNodes = matrix.GetSize();
             List<int> toVisit = new List<int>();
             for (int i = 1; i < numberOfNodes; i++)
                 toVisit.Add(i);
             List<int> visited = new List<int>() { 0 };
 
-            //FindCycles(visited, toVisit, 0);
-            MeilleurDAbord();
+            MeilleurDAbord(visited, toVisit);
         }
 
-        static void MeilleurDAbord()
+        static void TravellingSalesmanProfondeur(bool initWithGluttony, int matrixSize)
         {
+            matrix = new TwoDMatrix(matrixSize);
+
+            pcc = null;
+            pccCost = int.MaxValue;
+
+            if (initWithGluttony)
+                GluttonyShortestPath();
+
             int numberOfNodes = matrix.GetSize();
             List<int> toVisit = new List<int>();
             for (int i = 1; i < numberOfNodes; i++)
                 toVisit.Add(i);
             List<int> visited = new List<int>() { 0 };
+
+            ParcoursProfondeur(visited, toVisit, 0);
+        }
+
+        static void MeilleurDAbord(List<int> visited, List<int> toVisit)
+        {
 
             List<Etat> etats = new List<Etat>();
 
@@ -67,13 +122,13 @@ namespace BranchAndBound
             {
                 Etat current = etats[0];
 
-                Console.WriteLine($"\nStudying path {PathToString(current.alreadyVisited)}");
+                //Console.WriteLine($"\nStudying path {PathToString(current.alreadyVisited)}");
 
                 etats.RemoveAt(0);
 
                 if (current.borneInf > pccCost)
                 {
-                    Console.WriteLine($"Exiting as path {PathToString(current.alreadyVisited)} has a cost of {current.borneInf}");
+                    //Console.WriteLine($"Exiting as path {PathToString(current.alreadyVisited)} has a cost of {current.borneInf}");
                     break;
                 }
 
@@ -85,21 +140,21 @@ namespace BranchAndBound
                     List<int> notVisited = new List<int>(current.notVisited);
                     notVisited.Remove(i);
 
-                    Console.WriteLine($"Studying {PathToString(alreadyVisited)} - {PathToString(notVisited)}");
+                    //Console.WriteLine($"Studying {PathToString(alreadyVisited)} - {PathToString(notVisited)}");
 
                     int borneInf = GetPathLength(alreadyVisited);
                     borneInf += Bound(alreadyVisited[alreadyVisited.Count - 1], notVisited);
 
                     if (notVisited.Count == 0)
                     {
-                        Console.WriteLine($"\nEnded path found : {PathToString(alreadyVisited)} with a cost of {borneInf} - pccCost is {pccCost}");
+                        //Console.WriteLine($"\nEnded path found : {PathToString(alreadyVisited)} with a cost of {borneInf} - pccCost is {pccCost}");
 
                         if (borneInf < pccCost)
                         {
                             pcc = alreadyVisited;
                             pccCost = borneInf;
 
-                            Console.WriteLine($"\nBetter path found : {PathToString(pcc)}");
+                            //Console.WriteLine($"\nBetter path found : {PathToString(pcc)}");
                         }
                     }
                     else
@@ -112,21 +167,23 @@ namespace BranchAndBound
             }
         }
 
-        static void FindCycles(List<int> alreadyVisited, List<int> notVisited, int currentDistance)
+        static void ParcoursProfondeur(List<int> alreadyVisited, List<int> notVisited, int currentDistance)
         {
-            int currentMinimalDistance = Bound(alreadyVisited[alreadyVisited.Count - 1], notVisited) + currentDistance;
-
-            if (notVisited.Count > 1)
-            {
-                Console.WriteLine($"Vus\n{PathToString(alreadyVisited)}\nNon vus\n{PathToString(notVisited)}\nCurrent {currentDistance} with minimal {currentMinimalDistance}\n");
-            }
-
-            int numberOfNodes = matrix.GetSize();
-
             if (notVisited.Count == 0)
             {
-                Console.WriteLine($"Path <{PathToString(alreadyVisited)}> has a distance of {currentDistance + matrix.Get(alreadyVisited[alreadyVisited.Count - 1], 0)}");
+                int pathDistance = currentDistance + matrix.Get(alreadyVisited[alreadyVisited.Count - 1], 0);
+                //Console.WriteLine($"Path <{PathToString(alreadyVisited)}> has a distance of {pathDistance}");
+                if (pathDistance < pccCost)
+                {
+                    pcc = alreadyVisited;
+                    pccCost = pathDistance;
+                }
             }
+
+            int currentMinimalDistance = Bound(alreadyVisited[alreadyVisited.Count - 1], notVisited) + currentDistance;
+
+            if (currentMinimalDistance > pccCost)
+                return;
 
             int previouslyVisited = alreadyVisited[alreadyVisited.Count - 1];
 
@@ -138,7 +195,7 @@ namespace BranchAndBound
                 List<int> toVisit = new List<int>(notVisited);
                 toVisit.Remove(i);
 
-                FindCycles(visited, toVisit, currentDistance + matrix.Get(previouslyVisited, i));
+                ParcoursProfondeur(visited, toVisit, currentDistance + matrix.Get(previouslyVisited, i));
             }
         }
 
