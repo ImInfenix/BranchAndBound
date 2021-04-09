@@ -15,8 +15,8 @@ namespace BranchAndBound
             Console.WriteLine("Travelling Salesman - Branch and bound");
             Console.WriteLine("1 - Meilleur d'abord");
             Console.WriteLine("2 - Profondeur");
-            Console.WriteLine("Choix : ");
-            int choice = int.Parse(Console.ReadLine());
+            Console.WriteLine("Glutto ?");
+            bool choice = bool.Parse(Console.ReadLine());
 
             int nbExec = 10;
 
@@ -34,21 +34,15 @@ namespace BranchAndBound
 
                 matrix = new TwoDMatrix(matrixSize);
 
-                Console.WriteLine($"Avec glouton");
+                Console.WriteLine($"Meilleur d abord");
                 DateTime start = DateTime.Now;
-                if(choice == 1)
-                TravellingSalesmanMeilleur(true);
-                else
-                TravellingSalesmanProfondeur(true);
+                TravellingSalesmanMeilleur(choice);
                 DateTime end = DateTime.Now;
                 Console.WriteLine($"Ended with a  time of {end - start}");
 
-                Console.WriteLine($"Sans glouton");
+                Console.WriteLine($"Profondeur d abord");
                 start = DateTime.Now;
-                if (choice == 1)
-                    TravellingSalesmanMeilleur(false);
-                else
-                    TravellingSalesmanProfondeur(false);
+                TravellingSalesmanProfondeur(choice);
                 end = DateTime.Now;
                 Console.WriteLine($"Ended with a  time of {end - start}");
             }
