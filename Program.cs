@@ -15,11 +15,8 @@ namespace BranchAndBound
             Console.WriteLine("Travelling Salesman - Branch and bound");
             Console.WriteLine("1 - Meilleur d'abord");
             Console.WriteLine("2 - Profondeur");
-            //Console.WriteLine("Choix : ");
-            //int choice = int.Parse(Console.ReadLine());
-
-            Console.WriteLine("Algo vorace en borne sup ?");
-            bool doGlutto = bool.Parse(Console.ReadLine());
+            Console.WriteLine("Choix : ");
+            int choice = int.Parse(Console.ReadLine());
 
             int nbExec = 10;
 
@@ -27,40 +24,35 @@ namespace BranchAndBound
             int matrixSize = int.Parse(Console.ReadLine());
 
             Console.WriteLine("----------------------------");
-            //Console.WriteLine("Choice is " + choice);
+            Console.WriteLine("Choice is " + choice);
             Console.WriteLine("Nb Exec is " + nbExec);
             Console.WriteLine("Size is " + matrixSize);
-            Console.WriteLine("Gluttony first : " + doGlutto);
-
-            //DateTime totalTime = new DateTime(0);
 
             for (int i = 0; i < nbExec; i++)
             {
                 Console.WriteLine($"Computing pass {i}");
 
-                Console.WriteLine($"Meilleur d abord");
+                matrix = new TwoDMatrix(matrixSize);
+
+                Console.WriteLine($"Avec glouton");
                 DateTime start = DateTime.Now;
-                TravellingSalesmanMeilleur(doGlutto, matrixSize);
+                if(choice == 1)
+                TravellingSalesmanMeilleur(true);
+                else
+                TravellingSalesmanProfondeur(true);
                 DateTime end = DateTime.Now;
                 Console.WriteLine($"Ended with a  time of {end - start}");
 
-                Console.WriteLine($"Profondeur d abord");
+                Console.WriteLine($"Sans glouton");
                 start = DateTime.Now;
-                TravellingSalesmanMeilleur(doGlutto, matrixSize);
+                if (choice == 1)
+                    TravellingSalesmanMeilleur(false);
+                else
+                    TravellingSalesmanProfondeur(false);
                 end = DateTime.Now;
                 Console.WriteLine($"Ended with a  time of {end - start}");
-
-                TravellingSalesmanProfondeur(doGlutto, matrixSize);
-
-                //totalTime += end - start;
-                //Console.WriteLine($"Ended with a  time of {end - start}");
             }
 
-            //long total = totalTime.Ticks;
-
-            //total = total / (long)nbExec;
-
-            //Console.WriteLine($"Ended with an average time of {new DateTime(total)}");
             Console.WriteLine($"\n-----------------------------\nDONE\n-----------------------------");
 
             Console.ReadLine();
@@ -80,10 +72,8 @@ namespace BranchAndBound
 
         }
 
-        static void TravellingSalesmanMeilleur(bool initWithGluttony, int matrixSize)
+        static void TravellingSalesmanMeilleur(bool initWithGluttony)
         {
-            matrix = new TwoDMatrix(matrixSize);
-
             pcc = null;
             pccCost = int.MaxValue;
 
@@ -99,10 +89,8 @@ namespace BranchAndBound
             MeilleurDAbord(visited, toVisit);
         }
 
-        static void TravellingSalesmanProfondeur(bool initWithGluttony, int matrixSize)
+        static void TravellingSalesmanProfondeur(bool initWithGluttony)
         {
-            matrix = new TwoDMatrix(matrixSize);
-
             pcc = null;
             pccCost = int.MaxValue;
 
@@ -120,7 +108,6 @@ namespace BranchAndBound
 
         static void MeilleurDAbord(List<int> visited, List<int> toVisit)
         {
-
             List<Etat> etats = new List<Etat>();
 
             etats.Add(new Etat(0, visited, toVisit));
