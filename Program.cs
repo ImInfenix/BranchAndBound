@@ -15,8 +15,8 @@ namespace BranchAndBound
             Console.WriteLine("Travelling Salesman - Branch and bound");
             Console.WriteLine("1 - Meilleur d'abord");
             Console.WriteLine("2 - Profondeur");
-            Console.WriteLine("Choix : ");
-            int choice = int.Parse(Console.ReadLine());
+            //Console.WriteLine("Choix : ");
+            //int choice = int.Parse(Console.ReadLine());
 
             Console.WriteLine("Algo vorace en borne sup ?");
             bool doGlutto = bool.Parse(Console.ReadLine());
@@ -27,34 +27,41 @@ namespace BranchAndBound
             int matrixSize = int.Parse(Console.ReadLine());
 
             Console.WriteLine("----------------------------");
-            Console.WriteLine("Choice is " + choice);
+            //Console.WriteLine("Choice is " + choice);
             Console.WriteLine("Nb Exec is " + nbExec);
             Console.WriteLine("Size is " + matrixSize);
             Console.WriteLine("Gluttony first : " + doGlutto);
 
-            DateTime totalTime = new DateTime(0);
+            //DateTime totalTime = new DateTime(0);
 
-            for(int i =0; i < nbExec; i++)
+            for (int i = 0; i < nbExec; i++)
             {
                 Console.WriteLine($"Computing pass {i}");
 
+                Console.WriteLine($"Meilleur d abord");
                 DateTime start = DateTime.Now;
-                if (choice == 1)
-                    TravellingSalesmanMeilleur(doGlutto, matrixSize);
-                else if (choice == 2)
-                    TravellingSalesmanProfondeur(doGlutto, matrixSize);
-                else return;
+                TravellingSalesmanMeilleur(doGlutto, matrixSize);
                 DateTime end = DateTime.Now;
-
-                totalTime += end - start;
                 Console.WriteLine($"Ended with a  time of {end - start}");
+
+                Console.WriteLine($"Profondeur d abord");
+                start = DateTime.Now;
+                TravellingSalesmanMeilleur(doGlutto, matrixSize);
+                end = DateTime.Now;
+                Console.WriteLine($"Ended with a  time of {end - start}");
+
+                TravellingSalesmanProfondeur(doGlutto, matrixSize);
+
+                //totalTime += end - start;
+                //Console.WriteLine($"Ended with a  time of {end - start}");
             }
 
-            long total = totalTime.Ticks;
+            //long total = totalTime.Ticks;
 
-            total = total / (long)nbExec;
+            //total = total / (long)nbExec;
 
-            Console.WriteLine($"Ended with an average time of {new DateTime(total)}");
+            //Console.WriteLine($"Ended with an average time of {new DateTime(total)}");
+            Console.WriteLine($"\n-----------------------------\nDONE\n-----------------------------");
 
             Console.ReadLine();
         }
